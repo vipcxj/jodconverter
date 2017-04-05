@@ -24,11 +24,11 @@ import java.io.IOException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.artofsolving.jodconverter.OfficeDocumentConverter;
@@ -37,7 +37,6 @@ import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
 import org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry;
 import org.artofsolving.jodconverter.office.DefaultOfficeManagerConfiguration;
 import org.artofsolving.jodconverter.office.OfficeManager;
-import org.json.JSONException;
 
 /**
  * Command line interface executable.
@@ -63,8 +62,8 @@ public class Convert {
         return options;
     }
 
-    public static void main(String[] arguments) throws ParseException, JSONException, IOException {
-        CommandLineParser commandLineParser = new PosixParser();
+    public static void main(String[] arguments) throws ParseException, IOException {
+        CommandLineParser commandLineParser = new DefaultParser();
         CommandLine commandLine = commandLineParser.parse(OPTIONS, arguments);
 
         String outputFormat = null;

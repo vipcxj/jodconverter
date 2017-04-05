@@ -39,6 +39,7 @@
         <commons.cli.version>1.4</commons.cli.version>
         <openoffice.version>4.1.2</openoffice.version>
         <libreoffice.version>5.2.0</libreoffice.version>
+        <fastjson.version>1.2.31</fastjson.version>
         <testng.version>6.11</testng.version>
     </properties>
 
@@ -71,11 +72,17 @@
             <version>${openoffice.version}</version>
         </dependency>
 
-        <dependency>
+<!--        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20080701</version>
             <optional>true</optional>
+        </dependency>-->
+        
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
 
         <dependency>
