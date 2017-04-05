@@ -26,14 +26,6 @@ import org.artofsolving.jodconverter.process.ProcessManager;
 
 public class DefaultOfficeManagerConfiguration extends AbstractOfficeManagerConfiguration {
 
-    private File officeHome;
-
-    private OfficeConnectionProtocol connectionProtocol;
-
-    private int[] portNumbers;
-
-    private String[] pipeNames;
-
     private File templateProfileDir = null;
 
     private long taskQueueTimeout = 30000L; // 30 seconds
@@ -44,10 +36,6 @@ public class DefaultOfficeManagerConfiguration extends AbstractOfficeManagerConf
 
     private boolean useGnuStyleLongOptions;
 
-    private ProcessManager processManager;
-
-    private Boolean killExistingProcess;
-
     public DefaultOfficeManagerConfiguration() {
         super();
     }
@@ -57,56 +45,43 @@ public class DefaultOfficeManagerConfiguration extends AbstractOfficeManagerConf
         return (DefaultOfficeManagerConfiguration) super.load(properties, prefix);
     }
 
-    public DefaultOfficeManagerConfiguration setOfficeHome(String officeHome) throws NullPointerException,
-            IllegalArgumentException {
-        checkArgumentNotNull("officeHome", officeHome);
-        return setOfficeHome(new File(officeHome));
-    }
-
-    public DefaultOfficeManagerConfiguration setOfficeHome(File officeHome) throws NullPointerException,
-            IllegalArgumentException {
-        checkArgumentNotNull("officeHome", officeHome);
-        checkArgument("officeHome", officeHome.isDirectory(), "must exist and be a directory");
-        this.officeHome = officeHome;
+    public DefaultOfficeManagerConfiguration setOfficeHome(String officeHome) {
+        propertiesUtils.setOfficeHome(officeHome);
         return this;
     }
 
-    public DefaultOfficeManagerConfiguration setConnectionProtocol(OfficeConnectionProtocol connectionProtocol)
-            throws NullPointerException {
-        checkArgumentNotNull("connectionProtocol", connectionProtocol);
-        this.connectionProtocol = connectionProtocol;
+    public DefaultOfficeManagerConfiguration setOfficeHome(File officeHome) {
+        propertiesUtils.setOfficeHome(officeHome);
+        return this;
+    }
+
+    public DefaultOfficeManagerConfiguration setConnectionProtocol(OfficeConnectionProtocol connectionProtocol) {
+        propertiesUtils.setProtocol(connectionProtocol);
         return this;
     }
 
     public DefaultOfficeManagerConfiguration setKillExistingProcess(boolean killExistingProcess) {
-        this.killExistingProcess = killExistingProcess;
+        propertiesUtils.setProcessPreKill(killExistingProcess);
         return this;
     }
 
     public DefaultOfficeManagerConfiguration setPortNumber(int portNumber) {
-        portNumbers = new int[]{portNumber};
+        propertiesUtils.setPort(portNumber);
         return this;
     }
 
-    public DefaultOfficeManagerConfiguration setPortNumbers(int... portNumbers) throws NullPointerException,
-            IllegalArgumentException {
-        checkArgumentNotNull("portNumbers", portNumbers);
-        checkArgument("portNumbers", portNumbers.length > 0, "must not be empty");
-        this.portNumbers = portNumbers;
+    public DefaultOfficeManagerConfiguration setPortNumbers(int... portNumbers) {
+        propertiesUtils.setPorts(portNumbers);
         return this;
     }
 
-    public DefaultOfficeManagerConfiguration setPipeName(String pipeName) throws NullPointerException {
-        checkArgumentNotNull("pipeName", pipeName);
-        pipeNames = new String[]{pipeName};
+    public DefaultOfficeManagerConfiguration setPipeName(String pipeName) {
+        propertiesUtils.setPipeName(pipeName);
         return this;
     }
 
-    public DefaultOfficeManagerConfiguration setPipeNames(String... pipeNames) throws NullPointerException,
-            IllegalArgumentException {
-        checkArgumentNotNull("pipeNames", pipeNames);
-        checkArgument("pipeNames", pipeNames.length > 0, "must not be empty");
-        this.pipeNames = pipeNames;
+    public DefaultOfficeManagerConfiguration setPipeNames(String... pipeNames) {
+        propertiesUtils.setPipeNames(pipeNames);
         return this;
     }
 
@@ -134,33 +109,17 @@ public class DefaultOfficeManagerConfiguration extends AbstractOfficeManagerConf
         return this;
     }
 
-    public DefaultOfficeManagerConfiguration setProcessManager(ProcessManager processManager)
-            throws NullPointerException {
-        checkArgumentNotNull("processManager", processManager);
-        this.processManager = processManager;
+    public DefaultOfficeManagerConfiguration setProcessManager(ProcessManager processManager) {
+        propertiesUtils.setProcessManager(processManager);
         return this;
     }
 
     public OfficeManager buildOfficeManager() throws IllegalStateException {
-        if (officeHome == null) {
-            officeHome = propertiesUtils.getOfficeHome();
-        }
-        if (connectionProtocol == null) {
-            connectionProtocol = propertiesUtils.getProtocol();
-        }
-        if (portNumbers == null) {
-            portNumbers = propertiesUtils.getPorts();
-        }
-        if (pipeNames == null) {
-            pipeNames = propertiesUtils.getPipeNames();
-        }
-        if (processManager == null) {
-            processManager = propertiesUtils.getProcessManager();
-        }
-        if (killExistingProcess == null) {
-            killExistingProcess = propertiesUtils.isProcessPreKill();
-        }
-
+        File officeHome = propertiesUtils.getOfficeHome();
+        OfficeConnectionProtocol protocol = propertiesUtils.getProtocol();
+        int[] ports = propertiesUtils.getPorts();
+        String[] pipeNames = propertiesUtils.getPipeNames();
+        ProcessManager processManager = propertiesUtils.getProcessManager();
         if (!officeHome.isDirectory()) {
             throw new IllegalStateException("officeHome doesn't exist or is not a directory: " + officeHome);
         } else if (!OfficeUtils.getOfficeExecutable(officeHome).isFile()) {
@@ -176,14 +135,14 @@ public class DefaultOfficeManagerConfiguration extends AbstractOfficeManagerConf
             useGnuStyleLongOptions = Boolean.parseBoolean(forceOptionStyle);
         }
 
-        int numInstances = connectionProtocol == OfficeConnectionProtocol.PIPE ? pipeNames.length : portNumbers.length;
+        int numInstances = protocol == OfficeConnectionProtocol.PIPE ? pipeNames.length : ports.length;
         UnoUrl[] unoUrls = new UnoUrl[numInstances];
         for (int i = 0; i < numInstances; i++) {
-            unoUrls[i] = (connectionProtocol == OfficeConnectionProtocol.PIPE) ? UnoUrl.pipe(pipeNames[i])
-                    : UnoUrl.socket(portNumbers[i]);
+            unoUrls[i] = (protocol == OfficeConnectionProtocol.PIPE) ? UnoUrl.pipe(pipeNames[i])
+                    : UnoUrl.socket(ports[i]);
         }
         return new ProcessPoolOfficeManager(officeHome, unoUrls, templateProfileDir, taskQueueTimeout,
-                taskExecutionTimeout, maxTasksPerProcess, processManager, useGnuStyleLongOptions, killExistingProcess);
+                taskExecutionTimeout, maxTasksPerProcess, processManager, useGnuStyleLongOptions, propertiesUtils.isProcessPreKill());
     }
 
     private void checkArgumentNotNull(String argName, Object argValue) throws NullPointerException {

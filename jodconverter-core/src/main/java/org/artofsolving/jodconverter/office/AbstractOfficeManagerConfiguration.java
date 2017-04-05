@@ -6,7 +6,7 @@
 package org.artofsolving.jodconverter.office;
 
 import java.util.Properties;
-import org.artofsolving.jodconverter.util.PropertiesUtils;
+import org.artofsolving.jodconverter.util.PropertiesConfiguration;
 
 /**
  *
@@ -14,10 +14,10 @@ import org.artofsolving.jodconverter.util.PropertiesUtils;
  */
 public class AbstractOfficeManagerConfiguration {
 
-    protected final PropertiesUtils propertiesUtils;
+    protected final PropertiesConfiguration propertiesUtils;
 
     public AbstractOfficeManagerConfiguration() {
-        this.propertiesUtils = new PropertiesUtils();
+        this.propertiesUtils = new PropertiesConfiguration();
     }
 
     public AbstractOfficeManagerConfiguration load(Properties properties, String prefix) {

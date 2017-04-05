@@ -23,11 +23,6 @@ import java.util.Properties;
 
 public class ExternalOfficeManagerConfiguration extends AbstractOfficeManagerConfiguration {
 
-    private OfficeConnectionProtocol connectionProtocol;
-    private Integer portNumber;
-    private String pipeName;
-    private Boolean connectOnStart;
-
     public ExternalOfficeManagerConfiguration() {
         super();
     }
@@ -38,32 +33,28 @@ public class ExternalOfficeManagerConfiguration extends AbstractOfficeManagerCon
     }
 
     public ExternalOfficeManagerConfiguration setConnectionProtocol(OfficeConnectionProtocol connectionProtocol) {
-        this.connectionProtocol = connectionProtocol;
+        propertiesUtils.setProtocol(connectionProtocol);
         return this;
     }
 
     public ExternalOfficeManagerConfiguration setPortNumber(int portNumber) {
-        this.portNumber = portNumber;
+        propertiesUtils.setPort(portNumber);
         return this;
     }
 
     public ExternalOfficeManagerConfiguration setPipeName(String pipeName) {
-        this.pipeName = pipeName;
+        propertiesUtils.setPipeName(pipeName);
         return this;
     }
 
     public ExternalOfficeManagerConfiguration setConnectOnStart(boolean connectOnStart) {
-        this.connectOnStart = connectOnStart;
+        propertiesUtils.setConnectOnStart(connectOnStart);
         return this;
     }
 
     public OfficeManager buildOfficeManager() {
-        connectionProtocol = connectionProtocol != null ? connectionProtocol : propertiesUtils.getProtocol();
-        portNumber = portNumber != null ? portNumber : propertiesUtils.getPort();
-        pipeName = pipeName != null ? pipeName : propertiesUtils.getPipeName();
-        connectOnStart = connectOnStart != null ? connectOnStart : propertiesUtils.isConnectOnStart();
-        UnoUrl unoUrl = connectionProtocol == OfficeConnectionProtocol.SOCKET ? UnoUrl.socket(portNumber) : UnoUrl.pipe(pipeName);
-        return new ExternalOfficeManager(unoUrl, connectOnStart);
+        UnoUrl unoUrl = propertiesUtils.getProtocol() == OfficeConnectionProtocol.SOCKET ? UnoUrl.socket(propertiesUtils.getPort()) : UnoUrl.pipe(propertiesUtils.getPipeName());
+        return new ExternalOfficeManager(unoUrl, propertiesUtils.isConnectOnStart());
     }
 
 }

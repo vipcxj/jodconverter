@@ -22,7 +22,7 @@ package org.artofsolving.jodconverter.office;
 import java.io.File;
 
 import org.artofsolving.jodconverter.process.ProcessManager;
-import org.artofsolving.jodconverter.util.PropertiesUtils;
+import org.artofsolving.jodconverter.util.PropertiesConfiguration;
 
 class ManagedOfficeProcessSettings {
 
@@ -46,11 +46,11 @@ class ManagedOfficeProcessSettings {
 
     private Boolean killExistingProcess;
     
-    private final PropertiesUtils propertiesUtils;
+    private final PropertiesConfiguration propertiesUtils;
 
     public ManagedOfficeProcessSettings(UnoUrl unoUrl) {
         this.unoUrl = unoUrl;
-        this.propertiesUtils = new PropertiesUtils();
+        this.propertiesUtils = new PropertiesConfiguration();
     }
 
     public UnoUrl getUnoUrl() {

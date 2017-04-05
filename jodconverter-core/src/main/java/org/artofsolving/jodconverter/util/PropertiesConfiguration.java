@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -25,9 +26,9 @@ import org.artofsolving.jodconverter.process.WindowsProcessManager;
  *
  * @author Administrator
  */
-public class PropertiesUtils {
+public class PropertiesConfiguration {
 
-    private static final Logger LOGGER = Logger.getLogger(PropertiesUtils.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PropertiesConfiguration.class.getName());
 
     private final static String CONF_OFFICE_HOME = "office.home";
     private final static String CONF_PROCESS_MANAGER = "process.manager";
@@ -39,9 +40,12 @@ public class PropertiesUtils {
     private final static String CONF_CONNECT_PIPE_NAMES = "connect.pipe.names";
     private final static String CONF_CONNECT_ONSTART = "connect.onstart";
 
+    private ProcessManager processManager = null;
+    private static volatile String pipePath = null;
+
     private final Properties properties;
 
-    public PropertiesUtils() {
+    public PropertiesConfiguration() {
         Properties defaultProperties = new Properties();
         InputStream is = getClass().getResourceAsStream("/jodconverter.properties");
         if (is != null) {
@@ -80,6 +84,18 @@ public class PropertiesUtils {
             return new File(officeHome);
         } else {
             return OfficeUtils.getDefaultOfficeHome();
+        }
+    }
+
+    public void setOfficeHome(File file) {
+        setOfficeHome(file != null ? file.getAbsolutePath() : null);
+    }
+
+    public void setOfficeHome(String path) {
+        if (path != null) {
+            properties.setProperty(CONF_OFFICE_HOME, path);
+        } else {
+            properties.remove(CONF_OFFICE_HOME);
         }
     }
 
@@ -134,12 +150,29 @@ public class PropertiesUtils {
         return portNumber;
     }
 
+    public void setPort(int port) {
+        properties.setProperty(CONF_CONNECT_PORT, Integer.toString(port));
+    }
+
     public int[] getPorts() {
         int[] portNumbers = _getPorts(null);
         if (portNumbers == null || portNumbers.length == 0) {
             portNumbers = new int[]{_getPort(2002)};
         }
         return portNumbers;
+    }
+
+    public void setPorts(int[] ports) {
+        if (ports != null && ports.length > 0) {
+            String[] strPorts = new String[ports.length];
+            for (int i = 0; i < ports.length; i++) {
+                strPorts[i] = Integer.toString(ports[i]);
+            }
+            properties.setProperty(CONF_CONNECT_PORTS, String.join(",", strPorts));
+        } else {
+            properties.remove(CONF_CONNECT_PORTS);
+        }
+
     }
 
     private String _getPipeName(String defaultName) {
@@ -172,6 +205,14 @@ public class PropertiesUtils {
         return pipeName;
     }
 
+    public void setPipeName(String pipeName) {
+        if (pipeName != null) {
+            properties.setProperty(CONF_CONNECT_PIPE_NAME, pipeName);
+        } else {
+            properties.remove(CONF_CONNECT_PIPE_NAME);
+        }
+    }
+
     public String[] getPipeNames() {
         String[] pipeNames = _getPipeNames(null);
         if (pipeNames == null || pipeNames.length == 0) {
@@ -180,75 +221,158 @@ public class PropertiesUtils {
         return pipeNames;
     }
 
+    public void setPipeNames(String[] pipeNames) {
+        if (pipeNames != null && pipeNames.length > 0) {
+            properties.setProperty(CONF_CONNECT_PIPE_NAMES, String.join(",", pipeNames));
+        } else {
+            properties.remove(CONF_CONNECT_PIPE_NAMES);
+        }
+    }
+
+    private static OfficeConnectionProtocol toProtocol(String strProtocol) {
+        OfficeConnectionProtocol[] protocols = OfficeConnectionProtocol.values();
+        for (OfficeConnectionProtocol protocol : protocols) {
+            if (protocol.toString().equalsIgnoreCase(strProtocol)) {
+                return protocol;
+            }
+        }
+        return null;
+    }
+
     public OfficeConnectionProtocol getProtocol() {
-        OfficeConnectionProtocol connectionProtocol = null;
+        OfficeConnectionProtocol protocol;
         String pProtocol = properties.getProperty(CONF_CONNECT_PROTOCOL);
         if (pProtocol != null) {
-            OfficeConnectionProtocol[] protocols = OfficeConnectionProtocol.values();
-            for (OfficeConnectionProtocol protocol : protocols) {
-                if (protocol.toString().equalsIgnoreCase(pProtocol)) {
-                    connectionProtocol = protocol;
-                    break;
-                }
-            }
-            if (connectionProtocol == null) {
+            protocol = toProtocol(pProtocol);
+            if (protocol == null) {
                 LOGGER.log(Level.WARNING, "Invalid protocol type \"{0}\", use socket instead.", pProtocol);
-                connectionProtocol = OfficeConnectionProtocol.SOCKET;
+                protocol = OfficeConnectionProtocol.SOCKET;
             }
         } else {
-            connectionProtocol = OfficeConnectionProtocol.SOCKET;
+            protocol = OfficeConnectionProtocol.SOCKET;
         }
-        if (connectionProtocol == OfficeConnectionProtocol.PIPE) {
-            try {
-                Runtime.getRuntime().load(OfficeUtils.getJPipePath(getOfficeHome()));
-            } catch (UnsatisfiedLinkError e) {
-                LOGGER.log(Level.WARNING, e, new Supplier<String>() {
+        if (protocol == null) {
+            protocol = OfficeConnectionProtocol.SOCKET;
+        }
+        if (protocol == OfficeConnectionProtocol.PIPE) {
+            loadPipeLibrary(getOfficeHome());
+        }
+        return protocol;
+    }
 
-                    public String get() {
-                        return "Pipe is not avaialbe, use socket instead.";
-                    }
-                });
-                connectionProtocol = OfficeConnectionProtocol.SOCKET;
+    private static synchronized boolean loadPipeLibrary(File officeHome) {
+        try {
+            String pipePathNow = OfficeUtils.getJPipePath(officeHome);
+            if (!Objects.equals(pipePathNow, pipePath)) {
+                pipePath = pipePathNow;
+                Runtime.getRuntime().load(pipePath);
             }
+            return true;
+        } catch (UnsatisfiedLinkError e) {
+            LOGGER.log(Level.WARNING, e, new Supplier<String>() {
+
+                public String get() {
+                    return "Pipe is not avaialbe, use socket instead.";
+                }
+            });
+            return false;
         }
-        return connectionProtocol;
+    }
+
+    public void setProtocol(OfficeConnectionProtocol protocol) {
+        if (protocol != null) {
+            properties.setProperty(CONF_CONNECT_PROTOCOL, protocol.toString());
+        } else {
+            properties.remove(CONF_CONNECT_PROTOCOL);
+        }
+    }
+
+    private ProcessManager findBestProcessManager() {
+        if (PlatformUtils.isWindows()) {
+            WindowsProcessManager windowsProcessManager = new WindowsProcessManager();
+            if (windowsProcessManager.isUsable()) {
+                return windowsProcessManager;
+            } else {
+                return new PureJavaProcessManager();
+            }
+        } else if (PlatformUtils.isLinux()) {
+            return new UnixProcessManager();
+        } else if (PlatformUtils.isMac()) {
+            return new MacProcessManager();
+        } else {
+            return new PureJavaProcessManager();
+        }
+    }
+
+    private boolean isBestProcessManager(ProcessManager manager) {
+        if (PlatformUtils.isWindows()) {
+            if (manager instanceof WindowsProcessManager) {
+                return ((WindowsProcessManager) manager).isUsable();
+            } else {
+                return false;
+            }
+        } else if (PlatformUtils.isLinux()) {
+            return (manager instanceof UnixProcessManager);
+        } else if (PlatformUtils.isMac()) {
+            return (manager instanceof MacProcessManager);
+        } else {
+            return (manager instanceof PureJavaProcessManager);
+        }
     }
 
     public ProcessManager getProcessManager() {
-        String pProcessManager = properties.getProperty(CONF_PROCESS_MANAGER);
-        ProcessManager processManager = null;
-        if (pProcessManager != null) {
-            try {
-                Class<?> managerClass = Class.forName(pProcessManager);
-                Object managerInstance = managerClass.newInstance();
-                if (managerInstance instanceof ProcessManager) {
-                    processManager = (ProcessManager) managerInstance;
+        if (processManager == null) {
+            String pProcessManager = properties.getProperty(CONF_PROCESS_MANAGER);
+            if (pProcessManager != null) {
+                try {
+                    Class<?> managerClass = Class.forName(pProcessManager.trim());
+                    if (ProcessManager.class.isAssignableFrom(managerClass)) {
+                        Object managerInstance = managerClass.newInstance();
+                        processManager = (ProcessManager) managerInstance;
+                    }
+                } catch (ClassNotFoundException ex) {
+                    LOGGER.log(Level.WARNING, "Invalid process manager impl \"{0}\".", pProcessManager);
+                } catch (InstantiationException ex) {
+                    LOGGER.log(Level.WARNING, "Unable to create the instance of process manager impl \"{0}\".", pProcessManager);
+                } catch (IllegalAccessException ex) {
+                    LOGGER.log(Level.WARNING, "No access to create the instance of process manager impl \"{0}\".", pProcessManager);
                 }
-            } catch (ClassNotFoundException ex) {
-                LOGGER.log(Level.WARNING, "Invalid process manager impl \"{0}\".", pProcessManager);
-            } catch (InstantiationException ex) {
-                LOGGER.log(Level.WARNING, "Unable to create the instance of process manager impl \"{0}\".", pProcessManager);
-            } catch (IllegalAccessException ex) {
-                LOGGER.log(Level.WARNING, "No access to create the instance of process manager impl \"{0}\".", pProcessManager);
+            }
+        } else {
+            String pProcessManager = properties.getProperty(CONF_PROCESS_MANAGER);
+            if (pProcessManager == null && !isBestProcessManager(processManager)) {
+                processManager = null;
+            } else if (pProcessManager != null) {
+                try {
+                    Class<?> managerClass = Class.forName(pProcessManager.trim());
+                    if (!managerClass.isAssignableFrom(processManager.getClass())) {
+                        if (ProcessManager.class.isAssignableFrom(managerClass)) {
+                            Object managerInstance = managerClass.newInstance();
+                            processManager = (ProcessManager) managerInstance;
+                        }
+                    }
+                } catch (ClassNotFoundException e) {
+                    LOGGER.log(Level.WARNING, "Invalid process manager impl \"{0}\".", pProcessManager);
+                } catch (InstantiationException e) {
+                    LOGGER.log(Level.WARNING, "Unable to create the instance of process manager impl \"{0}\".", pProcessManager);
+                } catch (IllegalAccessException e) {
+                    LOGGER.log(Level.WARNING, "No access to create the instance of process manager impl \"{0}\".", pProcessManager);
+                }
             }
         }
         if (processManager == null) {
-            if (PlatformUtils.isWindows()) {
-                WindowsProcessManager windowsProcessManager = new WindowsProcessManager();
-                if (windowsProcessManager.isUsable()) {
-                    processManager = windowsProcessManager;
-                } else {
-                    processManager = new PureJavaProcessManager();
-                }
-            } else if (PlatformUtils.isLinux()) {
-                processManager = new UnixProcessManager();
-            } else if (PlatformUtils.isMac()) {
-                processManager = new MacProcessManager();
-            } else {
-                processManager = new PureJavaProcessManager();
-            }
+            processManager = findBestProcessManager();
         }
         return processManager;
+    }
+
+    public void setProcessManager(ProcessManager manager) {
+        this.processManager = manager;
+        if (manager != null) {
+            properties.put(CONF_PROCESS_MANAGER, manager.getClass().getName());
+        } else {
+            properties.remove(CONF_PROCESS_MANAGER);
+        }
     }
 
     private boolean toBoolean(String value) {
@@ -282,6 +406,10 @@ public class PropertiesUtils {
         return preKill;
     }
 
+    public void setProcessPreKill(boolean preKill) {
+        properties.setProperty(CONF_PROCESS_PREKILL, Boolean.toString(preKill));
+    }
+
     public boolean isConnectOnStart() {
         String pOnStart = properties.getProperty(CONF_CONNECT_ONSTART);
         boolean onStart = true;
@@ -294,5 +422,9 @@ public class PropertiesUtils {
             }
         }
         return onStart;
+    }
+
+    public void setConnectOnStart(boolean connectOnStart) {
+        properties.setProperty(CONF_CONNECT_ONSTART, Boolean.toString(connectOnStart));
     }
 }
