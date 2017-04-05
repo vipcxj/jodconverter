@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.artofsolving.jodconverter.office.OfficeConnectionProtocol;
@@ -196,6 +197,19 @@ public class PropertiesUtils {
             }
         } else {
             connectionProtocol = OfficeConnectionProtocol.SOCKET;
+        }
+        if (connectionProtocol == OfficeConnectionProtocol.PIPE) {
+            try {
+                Runtime.getRuntime().load(OfficeUtils.getJPipePath(getOfficeHome()));
+            } catch (UnsatisfiedLinkError e) {
+                LOGGER.log(Level.WARNING, e, new Supplier<String>() {
+
+                    public String get() {
+                        return "Pipe is not avaialbe, use socket instead.";
+                    }
+                });
+                connectionProtocol = OfficeConnectionProtocol.SOCKET;
+            }
         }
         return connectionProtocol;
     }
