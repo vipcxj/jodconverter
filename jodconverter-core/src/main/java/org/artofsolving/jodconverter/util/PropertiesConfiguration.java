@@ -8,6 +8,8 @@ package org.artofsolving.jodconverter.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.Properties;
@@ -42,6 +44,7 @@ public class PropertiesConfiguration {
 
     private ProcessManager processManager = null;
     private static volatile String pipePath = null;
+    private static volatile String binPath = null;
 
     private final Properties properties;
 
@@ -260,19 +263,98 @@ public class PropertiesConfiguration {
         return protocol;
     }
 
+    private static void replaceLibraryPath(String prePath, String path) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        if (prePath == null && path == null) {
+            return;
+        }
+        String strPaths = System.getProperty("java.library.path");
+        if (strPaths != null) {
+            String[] arrPaths = strPaths.split(";");
+            for (String arrPath : arrPaths) {
+                if (new File(arrPath).equals(new File(path))) {
+                    return;
+                }
+            }
+        }
+        final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
+        usrPathsField.setAccessible(true);
+        final String[] paths = (String[]) usrPathsField.get(null);
+        if (path == null) {
+            int idx = -1;
+            for (int i = 0; i < paths.length; i++) {
+                if (Objects.equals(prePath, paths[i])) {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx != -1) {
+                final String[] newPaths = new String[paths.length - 1];
+                System.arraycopy(paths, 0, newPaths, 0, idx);
+                if (idx < paths.length - 1) {
+                    System.arraycopy(paths, idx + 1, newPaths, idx, paths.length - idx - 1);
+                }
+                usrPathsField.set(null, newPaths);
+            }
+        } else {
+            int idx = -1;
+            for (int i = 0; i < paths.length; i++) {
+                if (Objects.equals(prePath, paths[i])) {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx != -1) {
+                paths[idx] = path;
+            } else {
+                final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
+                newPaths[newPaths.length - 1] = path;
+                usrPathsField.set(null, newPaths);
+            }
+        }
+    }
+
     private static synchronized boolean loadPipeLibrary(File officeHome) {
         try {
             String pipePathNow = OfficeUtils.getJPipePath(officeHome);
+            String binPathNow = OfficeUtils.getOfficeBinDir(officeHome).getAbsolutePath();
             if (!Objects.equals(pipePathNow, pipePath)) {
+                Runtime.getRuntime().load(pipePathNow);
                 pipePath = pipePathNow;
-                Runtime.getRuntime().load(pipePath);
+            }
+            if (!Objects.equals(binPathNow, binPath)) {
+                replaceLibraryPath(binPath, binPathNow);
+                binPath = binPathNow;
             }
             return true;
         } catch (UnsatisfiedLinkError e) {
             LOGGER.log(Level.WARNING, e, new Supplier<String>() {
 
                 public String get() {
-                    return "Pipe is not avaialbe, use socket instead.";
+                    return "Pipe is not avaialbe.";
+                }
+            });
+            return false;
+        } catch (NoSuchFieldException e) {
+            LOGGER.log(Level.WARNING, e, new Supplier<String>() {
+
+                public String get() {
+                    return "Pipe is not avaialbe.";
+                }
+            });
+            return false;
+        } catch (IllegalArgumentException e) {
+            LOGGER.log(Level.WARNING, e, new Supplier<String>() {
+
+                public String get() {
+                    return "Pipe is not avaialbe.";
+                }
+            });
+            return false;
+        } catch (IllegalAccessException e) {
+            LOGGER.log(Level.WARNING, e, new Supplier<String>() {
+
+                public String get() {
+                    return "Pipe is not avaialbe.";
                 }
             });
             return false;

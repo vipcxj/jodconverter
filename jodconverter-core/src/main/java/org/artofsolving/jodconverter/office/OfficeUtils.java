@@ -118,13 +118,24 @@ public class OfficeUtils {
         }
     }
 
-    public static String getJPipePath(File officeHome) {
+    public static File getOfficeBinDir(File officeHome) {
         if (PlatformUtils.isMac()) {
-            return new File(officeHome, "MacOS/jpipe.so").getAbsolutePath();
-        } else if (PlatformUtils.isWindows()) {
-            return new File(officeHome, "program/jpipe.dll").getAbsolutePath();
+            File file = new File(officeHome, "MacOS/");
+            if (!file.isFile()) {
+                // LibreOffice 4.1.0
+                file = new File(officeHome, "MacOS/");
+            }
+            return file;
         } else {
-            return new File(officeHome, "program/jpipe.so").getAbsolutePath();
+            return new File(officeHome, "program/");
+        }
+    }
+
+    public static String getJPipePath(File officeHome) {
+        if (PlatformUtils.isWindows()) {
+            return new File(getOfficeBinDir(officeHome), "jpipe.dll").getAbsolutePath();
+        } else {
+            return new File(getOfficeBinDir(officeHome), "jpipe.so").getAbsolutePath();
         }
     }
 }
