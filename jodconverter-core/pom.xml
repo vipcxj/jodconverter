@@ -147,10 +147,35 @@
     
     <profiles>
         <profile>
-            <id>libreoffice</id>
+            <id>default</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.libreoffice</groupId>
+                    <artifactId>juh</artifactId>
+                    <version>${libreoffice.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.libreoffice</groupId>
+                    <artifactId>ridl</artifactId>
+                    <version>${libreoffice.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.libreoffice</groupId>
+                    <artifactId>unoil</artifactId>
+                    <version>${libreoffice.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.libreoffice</groupId>
+                    <artifactId>jurt</artifactId>
+                    <version>${libreoffice.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>libreoffice</id>
             <dependencies>
                 <dependency>
                     <groupId>org.libreoffice</groupId>
