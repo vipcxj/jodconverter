@@ -5,13 +5,13 @@
 
     <groupId>org.artofsolving.jodconverter</groupId>
     <artifactId>jodconverter-core</artifactId>
-    <version>3.0-NX11-SNAPSHOT</version>
+    <version>3.0-CXJ-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>JODConverter - Core Library</name>
     <description>
         JODConverter converts office documents using OpenOffice.org.
-        Nuxeo maintenance branch forked from tag 3.0-beta-3.
+        CXJ maintenance branch forked from tag 3.0-NX11-SNAPSHOT.
     </description>
     <url>http://jodconverter.googlecode.com</url>
     <licenses>
@@ -21,9 +21,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git://github.com/nuxeo/jodconverter.git</connection>
-        <developerConnection>scm:git:https://github.com/nuxeo/jodconverter.git</developerConnection>
-        <url>https://github.com/nuxeo/jodconverter</url>
+        <connection>scm:git:git://github.com/vipcxj/jodconverter.git</connection>
+        <developerConnection>scm:git:https://github.com/vipcxj/jodconverter.git</developerConnection>
+        <url>https://github.com/vipcxj/jodconverter</url>
     </scm>
     <inceptionYear>2003</inceptionYear>
     <developers>
@@ -57,29 +57,6 @@
         </dependency>
         
         <dependency>
-            <groupId>org.openoffice</groupId>
-            <artifactId>juh</artifactId>
-            <version>${openoffice.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openoffice</groupId>
-            <artifactId>ridl</artifactId>
-            <version>${openoffice.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openoffice</groupId>
-            <artifactId>unoil</artifactId>
-            <version>${openoffice.version}</version>
-        </dependency>
-
-<!--        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20080701</version>
-            <optional>true</optional>
-        </dependency>-->
-        
-        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>${fastjson.version}</version>
@@ -94,6 +71,22 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>org.artofsolving.jodconverter.cli.Convert</mainClass>
+                                <addClasspath>true</addClasspath>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -114,14 +107,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.artofsolving.jodconverter.cli.Convert</mainClass>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -147,70 +132,89 @@
         </plugins>
     </reporting>
 
-    <repositories>
-        <repository>
-            <id>public</id>
-            <url>http://maven.nuxeo.org/nexus/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>public-snapshot</id>
-            <url>http://maven.nuxeo.org/nexus/content/groups/public-snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <updatePolicy>always</updatePolicy>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>public</id>
-            <url>http://maven.nuxeo.org/nexus/content/groups/public</url>
-            <name>Nuxeo virtual release repository</name>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>public-snapshot</id>
-            <url>http://maven.nuxeo.org/nexus/content/groups/public-snapshot</url>
-            <name>Nuxeo virtual snapshot repository</name>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <updatePolicy>always</updatePolicy>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
     <distributionManagement>
         <repository>
-            <id>vendor-releases</id>
-            <url>
-                https://maven.nuxeo.org/nexus/content/repositories/vendor-releases/
-            </url>
+            <id>proland-release</id>
+            <name>Proland project release</name>
+            <url>http://192.168.1.116:8082/nexus/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
-            <id>vendor-snapshots</id>
-            <url>
-                https://maven.nuxeo.org/nexus/content/repositories/vendor-snapshots/
-            </url>
-            <uniqueVersion>true</uniqueVersion>
+            <id>proland-snapshots</id>
+            <name>Proland project snapshots</name>
+            <url>http://192.168.1.116:8082/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-
+    
+    <profiles>
+        <profile>
+            <id>libreoffice</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.libreoffice</groupId>
+                    <artifactId>juh</artifactId>
+                    <version>${libreoffice.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.libreoffice</groupId>
+                    <artifactId>ridl</artifactId>
+                    <version>${libreoffice.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.libreoffice</groupId>
+                    <artifactId>unoil</artifactId>
+                    <version>${libreoffice.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.libreoffice</groupId>
+                    <artifactId>jurt</artifactId>
+                    <version>${libreoffice.version}</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <classifier>libreoffice</classifier>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>openoffice</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.openoffice</groupId>
+                    <artifactId>juh</artifactId>
+                    <version>${openoffice.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.openoffice</groupId>
+                    <artifactId>ridl</artifactId>
+                    <version>${openoffice.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.openoffice</groupId>
+                    <artifactId>unoil</artifactId>
+                    <version>${openoffice.version}</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <classifier>openoffice</classifier>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
