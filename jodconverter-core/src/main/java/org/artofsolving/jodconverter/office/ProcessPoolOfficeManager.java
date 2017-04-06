@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.artofsolving.jodconverter.process.ProcessManager;
@@ -37,7 +38,7 @@ class ProcessPoolOfficeManager implements OfficeManager {
 
     private volatile boolean running = false;
 
-    private final Logger logger = Logger.getLogger(ProcessPoolOfficeManager.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ProcessPoolOfficeManager.class.getName());
 
     public ProcessPoolOfficeManager(File officeHome, UnoUrl[] unoUrls, File templateProfileDir, long taskQueueTimeout,
             long taskExecutionTimeout, int maxTasksPerProcess, ProcessManager processManager) {
@@ -49,7 +50,7 @@ class ProcessPoolOfficeManager implements OfficeManager {
             long taskExecutionTimeout, int maxTasksPerProcess, ProcessManager processManager,
             boolean useGnuStyleLongOptions, boolean killExistingProcess) {
         this.taskQueueTimeout = taskQueueTimeout;
-        pool = new ArrayBlockingQueue<PooledOfficeManager>(unoUrls.length);
+        pool = new ArrayBlockingQueue<>(unoUrls.length);
         pooledManagers = new PooledOfficeManager[unoUrls.length];
         for (int i = 0; i < unoUrls.length; i++) {
             PooledOfficeManagerSettings settings = new PooledOfficeManagerSettings(unoUrls[i]);
@@ -62,7 +63,7 @@ class ProcessPoolOfficeManager implements OfficeManager {
             settings.setKillExistingProcess(killExistingProcess);
             pooledManagers[i] = new PooledOfficeManager(settings);
         }
-        logger.info("ProcessManager implementation is " + processManager.getClass().getSimpleName());
+        LOGGER.log(Level.INFO, "ProcessManager implementation is {0}", processManager.getClass().getSimpleName());
     }
 
     @Override
@@ -96,12 +97,12 @@ class ProcessPoolOfficeManager implements OfficeManager {
     @Override
     public synchronized void stop() throws OfficeException {
         running = false;
-        logger.info("stopping");
+        LOGGER.info("stopping");
         pool.clear();
         for (int i = 0; i < pooledManagers.length; i++) {
             pooledManagers[i].stop();
         }
-        logger.info("stopped");
+        LOGGER.info("stopped");
     }
 
     private PooledOfficeManager acquireManager() {
@@ -122,12 +123,12 @@ class ProcessPoolOfficeManager implements OfficeManager {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("Running :" + running);
-        sb.append("\n Managers : " + pooledManagers.length);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Running :").append(running);
+        sb.append("\n Managers : ").append(pooledManagers.length);
         for (int i = 0; i < pooledManagers.length; i++) {
-            sb.append("\n   Manager " + i);
-            sb.append("\n   " + pooledManagers[i].toString());
+            sb.append("\n   Manager ").append(i);
+            sb.append("\n   ").append(pooledManagers[i].toString());
         }
         return sb.toString();
     }

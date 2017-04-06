@@ -84,7 +84,7 @@ public class DefaultDocumentFormatRegistry extends SimpleDocumentFormatRegistry 
 
 		DocumentFormat txt = new DocumentFormat("Plain Text", "txt", "text/plain");
 		txt.setInputFamily(DocumentFamily.TEXT);
-		Map<String,Object> txtLoadAndStoreProperties = new LinkedHashMap<String,Object>();
+		Map<String,Object> txtLoadAndStoreProperties = new LinkedHashMap<>();
 		txtLoadAndStoreProperties.put("FilterName", "Text (encoded)");
 		txtLoadAndStoreProperties.put("FilterOptions", "utf8");
 		txt.setLoadProperties(txtLoadAndStoreProperties);
@@ -115,7 +115,7 @@ public class DefaultDocumentFormatRegistry extends SimpleDocumentFormatRegistry 
 
         DocumentFormat csv = new DocumentFormat("Comma Separated Values", "csv", "text/csv");
         csv.setInputFamily(DocumentFamily.SPREADSHEET);
-        Map<String,Object> csvLoadAndStoreProperties = new LinkedHashMap<String,Object>();
+        Map<String,Object> csvLoadAndStoreProperties = new LinkedHashMap<>();
         csvLoadAndStoreProperties.put("FilterName", "Text - txt - csv (StarCalc)");
         csvLoadAndStoreProperties.put("FilterOptions", "44,34,0");  // Field Separator: ','; Text Delimiter: '"' 
         csv.setLoadProperties(csvLoadAndStoreProperties);
@@ -124,7 +124,7 @@ public class DefaultDocumentFormatRegistry extends SimpleDocumentFormatRegistry 
 
         DocumentFormat tsv = new DocumentFormat("Tab Separated Values", "tsv", "text/tab-separated-values");
         tsv.setInputFamily(DocumentFamily.SPREADSHEET);
-        Map<String,Object> tsvLoadAndStoreProperties = new LinkedHashMap<String,Object>();
+        Map<String,Object> tsvLoadAndStoreProperties = new LinkedHashMap<>();
         tsvLoadAndStoreProperties.put("FilterName", "Text - txt - csv (StarCalc)");
         tsvLoadAndStoreProperties.put("FilterOptions", "9,34,0");  // Field Separator: '\t'; Text Delimiter: '"' 
         tsv.setLoadProperties(tsvLoadAndStoreProperties);

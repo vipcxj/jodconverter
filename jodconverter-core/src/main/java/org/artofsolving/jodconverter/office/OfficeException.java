@@ -28,6 +28,6 @@ public class OfficeException extends RuntimeException {
     }
 
     public OfficeException(String message, Throwable cause) {
-		super(message, cause);
-	}
+        super(message, cause);
+    }
 }

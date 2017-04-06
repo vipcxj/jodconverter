@@ -91,7 +91,7 @@ public class DocumentFormat {
 
     public void setStoreProperties(DocumentFamily family, Map<String,?> storeProperties) {
         if (storePropertiesByFamily == null) {
-            storePropertiesByFamily = new HashMap<DocumentFamily,Map<String,?>>();
+            storePropertiesByFamily = new HashMap<>();
         }
         storePropertiesByFamily.put(family, storeProperties);
     }

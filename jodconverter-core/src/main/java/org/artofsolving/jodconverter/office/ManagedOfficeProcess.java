@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import com.sun.star.frame.XDesktop;
 import com.sun.star.lang.DisposedException;
+import java.util.logging.Level;
 
 class ManagedOfficeProcess {
 
@@ -36,7 +37,7 @@ class ManagedOfficeProcess {
 
     private final OfficeConnection connection;
 
-    private ExecutorService executor = Executors.newSingleThreadExecutor(new NamedThreadFactory("OfficeProcessThread"));
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(new NamedThreadFactory("OfficeProcessThread"));
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -148,7 +149,7 @@ class ManagedOfficeProcess {
     private void doEnsureProcessExited() throws OfficeException {
         try {
             int exitCode = process.getExitCode(settings.getRetryInterval(), settings.getRetryTimeout());
-            logger.info("process exited with code " + exitCode);
+            logger.log(Level.INFO, "process exited with code {0}", exitCode);
         } catch (RetryTimeoutException retryTimeoutException) {
             doTerminateProcess();
         }
@@ -159,7 +160,7 @@ class ManagedOfficeProcess {
     private void doTerminateProcess() {
         try {
             int exitCode = process.forciblyTerminate(settings.getRetryInterval(), settings.getRetryTimeout());
-            logger.info("process forcibly terminated with code " + exitCode);
+            logger.log(Level.INFO, "process forcibly terminated with code {0}", exitCode);
         } catch (Exception exception) {
             throw new OfficeException("could not terminate process", exception);
         }
@@ -167,7 +168,7 @@ class ManagedOfficeProcess {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\nSettings :");
         sb.append(settings.toString());
         sb.append("\nOffice Process :");

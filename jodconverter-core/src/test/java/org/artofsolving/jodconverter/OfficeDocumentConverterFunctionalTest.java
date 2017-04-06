@@ -23,8 +23,12 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
@@ -76,12 +80,21 @@ public class OfficeDocumentConverterFunctionalTest {
                     }
                     File outputFile = File.createTempFile("test", "." + outputFormat.getExtension());
                     outputFile.deleteOnExit();
-                    System.out.printf("-- converting %s to %s... ", inputFormat.getExtension(),
-                            outputFormat.getExtension());
+                    System.out.printf("-- (file) converting %s to %s... ", inputFormat.getExtension(), outputFormat.getExtension());
                     converter.convert(inputFile, outputFile, outputFormat);
-                    System.out.printf("done.\n");
+                    System.out.printf("done.%n");
                     assertTrue(outputFile.isFile() && outputFile.length() > 0);
-                    // TODO use file detection to make sure outputFile is in the expected format
+
+                    File outputFileForStream = File.createTempFile("test-stream", "." + outputFormat.getExtension());
+                    outputFileForStream.deleteOnExit();
+                    System.out.printf("-- (stream) converting %s to %s... ", inputFormat.getExtension(), outputFormat.getExtension());
+                    try (InputStream is = new FileInputStream(inputFile)) {
+                        try (OutputStream os = new FileOutputStream(outputFileForStream)) {
+                            converter.convert(is, inputFormat, os, outputFormat);
+                        }
+                    }
+                    System.out.printf("done.%n");
+                    assertTrue(outputFileForStream.isFile() && outputFileForStream.length() > 0);
                 }
             }
         } finally {

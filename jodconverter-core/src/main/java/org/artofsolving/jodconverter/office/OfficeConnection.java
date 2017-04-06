@@ -40,7 +40,7 @@ import com.sun.star.uno.XComponentContext;
 
 class OfficeConnection implements OfficeContext {
 
-    private static AtomicInteger bridgeIndex = new AtomicInteger();
+    private static final AtomicInteger bridgeIndex = new AtomicInteger();
 
     private final UnoUrl unoUrl;
 
@@ -48,11 +48,12 @@ class OfficeConnection implements OfficeContext {
     private XMultiComponentFactory serviceManager;
     private XComponentContext componentContext;
 
-    private final List<OfficeConnectionEventListener> connectionEventListeners = new ArrayList<OfficeConnectionEventListener>();
+    private final List<OfficeConnectionEventListener> connectionEventListeners = new ArrayList<>();
 
     private volatile boolean connected = false;
 
-    private XEventListener bridgeListener = new XEventListener() {
+    private final XEventListener bridgeListener = new XEventListener() {
+        @Override
         public void disposing(EventObject event) {
             if (connected) {
                 connected = false;
@@ -113,6 +114,7 @@ class OfficeConnection implements OfficeContext {
         bridgeComponent.dispose();
     }
 
+    @Override
     public Object getService(String serviceName) {
         try {
             return serviceManager.createInstanceWithContext(serviceName, componentContext);

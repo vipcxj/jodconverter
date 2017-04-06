@@ -1,5 +1,6 @@
 package org.artofsolving.jodconverter.office;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class OfficeVersionDescriptor {
@@ -18,7 +19,7 @@ public class OfficeVersionDescriptor {
     }
 
     public OfficeVersionDescriptor(String checkString) {
-        logger.fine("Building " + this.getClass().getSimpleName() + ": " + checkString.trim());
+        logger.log(Level.FINE, "Building {0}: {1}", new Object[]{this.getClass().getSimpleName(), checkString.trim()});
         String productLine = null;
         String[] lines = checkString.split("\\n");
         for (String line : lines) {
@@ -46,7 +47,7 @@ public class OfficeVersionDescriptor {
             productName = "???";
             version = "???";
         }
-        logger.info("soffice info: " + toString());
+        logger.log(Level.INFO, "soffice info: {0}", toString());
     }
 
     public static OfficeVersionDescriptor parseFromExecutableLocation(String path) {

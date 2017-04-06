@@ -23,14 +23,17 @@ public class PureJavaProcessManager implements ProcessManager {
 
     protected static final boolean PID_ENABLED = false;
 
+    @Override
     public String findPid(String regex) {
         return null;
     }
 
+    @Override
     public void kill(Process process, String pid) {
         process.destroy();
     }
 
+    @Override
     public boolean canFindPid() {
         return PID_ENABLED;
     }

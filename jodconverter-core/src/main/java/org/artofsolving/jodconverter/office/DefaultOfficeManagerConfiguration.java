@@ -145,12 +145,6 @@ public class DefaultOfficeManagerConfiguration extends AbstractOfficeManagerConf
                 taskExecutionTimeout, maxTasksPerProcess, processManager, useGnuStyleLongOptions, propertiesUtils.isProcessPreKill());
     }
 
-    private void checkArgumentNotNull(String argName, Object argValue) throws NullPointerException {
-        if (argValue == null) {
-            throw new NullPointerException(argName + " must not be null");
-        }
-    }
-
     private void checkArgument(String argName, boolean condition, String message) throws IllegalArgumentException {
         if (!condition) {
             throw new IllegalArgumentException(argName + " " + message);

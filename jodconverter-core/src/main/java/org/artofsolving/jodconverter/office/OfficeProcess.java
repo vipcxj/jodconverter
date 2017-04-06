@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -94,7 +95,7 @@ class OfficeProcess {
             return;
         }
 
-        List<String> command = new ArrayList<String>();
+        List<String> command = new ArrayList<>();
         command.add(executable.getAbsolutePath());
         command.add("-help");
         command.add("-headless");
@@ -147,7 +148,7 @@ class OfficeProcess {
                 COMMAND_ARG_PREFIX = "-";
             }
         }
-        logger.fine("OfficeProcess info:" + versionDescriptor.toString());
+        logger.log(Level.FINE, "OfficeProcess info:{0}", versionDescriptor.toString());
         doStart(false);
     }
 
@@ -200,7 +201,7 @@ class OfficeProcess {
             prepareFakeBundlesDir();
         }
 
-        List<String> command = new ArrayList<String>();
+        List<String> command = new ArrayList<>();
         File executable = OfficeUtils.getOfficeExecutable(officeHome);
         command.add(executable.getAbsolutePath());
         command.add(COMMAND_ARG_PREFIX + "accept=" + unoUrl.getAcceptString() + ";urp;");
@@ -253,7 +254,7 @@ class OfficeProcess {
                 } catch (Exception e) {
                 }
             } else {
-                logger.warning("Process exited with code " + exitValue);
+                logger.log(Level.WARNING, "Process exited with code {0}", exitValue);
             }
         }
 
@@ -264,7 +265,7 @@ class OfficeProcess {
             if (pid == null) {
                 throw new IllegalStateException("started process, but can not find the pid, process is probably dead");
             } else {
-                logger.info("started process : pid = " + pid);
+                logger.log(Level.INFO, "started process : pid = {0}", pid);
             }
         } else {
             logger.info("process started with PureJavaProcessManager - cannot check for pid");
@@ -422,31 +423,31 @@ class OfficeProcess {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("\nOfficeHome : " + officeHome);
-        sb.append("\nUnoUrl : " + unoUrl);
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nOfficeHome : ").append(officeHome);
+        sb.append("\nUnoUrl : ").append(unoUrl);
         if (lastCommand != null) {
             sb.append("\nCommand line : \n");
             for (String part : lastCommand) {
-                sb.append(part + " ");
+                sb.append(part).append(" ");
             }
         }
-        sb.append("\nPID : " + pid);
+        sb.append("\nPID : ").append(pid);
         if (templateProfileDir == null) {
             sb.append("\ntemplateProfileDir : null");
         } else {
-            sb.append("\ntemplateProfileDir : " + templateProfileDir.getAbsolutePath());
+            sb.append("\ntemplateProfileDir : ").append(templateProfileDir.getAbsolutePath());
         }
         if (instanceProfileDir == null) {
             sb.append("\ninstanceProfileDir : null");
 
         } else {
-            sb.append("\ninstanceProfileDir : " + instanceProfileDir.getAbsolutePath());
+            sb.append("\ninstanceProfileDir : ").append(instanceProfileDir.getAbsolutePath());
 
         }
-        sb.append("\nProcessManager : " + processManager.getClass().getSimpleName());
+        sb.append("\nProcessManager : ").append(processManager.getClass().getSimpleName());
         if (versionDescriptor != null) {
-            sb.append("\nversionDescriptor : " + versionDescriptor.toString());
+            sb.append("\nversionDescriptor : ").append(versionDescriptor.toString());
         }
         return sb.toString();
     }
@@ -468,7 +469,7 @@ class StreamGobbler implements Runnable {
         String line;
         try {
             while ((line = br.readLine()) != null) {
-                logger.warning("StreamGobbler: " + line);
+                logger.log(Level.WARNING, "StreamGobbler: {0}", line);
             }
         } catch (IOException e) {
             logger.warning(e.getMessage());

@@ -44,6 +44,7 @@ public class UnixProcessManager implements ProcessManager {
         return new String[] { "/bin/ps", "-e", "-o", "pid,args" };
     }
 
+    @Override
     public String findPid(String regex) throws IOException {
         Pattern commandPattern = Pattern.compile(regex);
         for (String line : execute(psCommand())) {
@@ -59,6 +60,7 @@ public class UnixProcessManager implements ProcessManager {
         return null;
     }
 
+    @Override
     public void kill(Process process, String pid) throws IOException {
         execute("/bin/kill", "-KILL", pid);
     }
@@ -70,6 +72,7 @@ public class UnixProcessManager implements ProcessManager {
         return lines;
     }
 
+    @Override
     public boolean canFindPid() {
         return PID_ENABLED;
     }

@@ -19,6 +19,7 @@ public class WindowsProcessManager implements ProcessManager {
 
     private static final Pattern PROCESS_GET_LINE = Pattern.compile("^(.*?)\\s+(\\d+)\\s*$");
 
+    @Override
     public String findPid(String regex) throws IOException {
         Pattern commandPattern = Pattern.compile(regex);
         for (String line : execute("wmic", "process", "get", "CommandLine,ProcessId")) {
@@ -35,6 +36,7 @@ public class WindowsProcessManager implements ProcessManager {
         return null;
     }
 
+    @Override
     public void kill(Process process, String pid) throws IOException {
         execute("taskkill", "/t", "/f", "/pid", pid);
     }
@@ -62,6 +64,7 @@ public class WindowsProcessManager implements ProcessManager {
         return lines;
     }
 
+    @Override
     public boolean canFindPid() {
         return PID_ENABLED;
     }

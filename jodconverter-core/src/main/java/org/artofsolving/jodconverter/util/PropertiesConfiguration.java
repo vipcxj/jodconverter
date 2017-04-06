@@ -329,6 +329,7 @@ public class PropertiesConfiguration {
         } catch (UnsatisfiedLinkError e) {
             LOGGER.log(Level.WARNING, e, new Supplier<String>() {
 
+                @Override
                 public String get() {
                     return "Pipe is not avaialbe.";
                 }
@@ -337,6 +338,7 @@ public class PropertiesConfiguration {
         } catch (NoSuchFieldException e) {
             LOGGER.log(Level.WARNING, e, new Supplier<String>() {
 
+                @Override
                 public String get() {
                     return "Pipe is not avaialbe.";
                 }
@@ -345,6 +347,7 @@ public class PropertiesConfiguration {
         } catch (IllegalArgumentException e) {
             LOGGER.log(Level.WARNING, e, new Supplier<String>() {
 
+                @Override
                 public String get() {
                     return "Pipe is not avaialbe.";
                 }
@@ -353,6 +356,7 @@ public class PropertiesConfiguration {
         } catch (IllegalAccessException e) {
             LOGGER.log(Level.WARNING, e, new Supplier<String>() {
 
+                @Override
                 public String get() {
                     return "Pipe is not avaialbe.";
                 }

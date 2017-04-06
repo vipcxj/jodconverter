@@ -29,8 +29,8 @@ import java.util.concurrent.locks.ReentrantLock;
 class SuspendableThreadPoolExecutor extends ThreadPoolExecutor {
 
     private boolean available = false;
-    private ReentrantLock suspendLock = new ReentrantLock();
-    private Condition availableCondition = suspendLock.newCondition();
+    private final ReentrantLock suspendLock = new ReentrantLock();
+    private final Condition availableCondition = suspendLock.newCondition();
 
     public SuspendableThreadPoolExecutor(ThreadFactory threadFactory) {
         super(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory);

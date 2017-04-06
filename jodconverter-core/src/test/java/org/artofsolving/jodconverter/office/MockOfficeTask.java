@@ -42,6 +42,7 @@ public class MockOfficeTask implements OfficeTask {
         this.delayTime = delayTime;
     }
 
+    @Override
     public void execute(OfficeContext context) throws OfficeException {
         XComponentLoader loader = cast(XComponentLoader.class, context.getService(SERVICE_DESKTOP));
         assert loader != null : "desktop object is null";

@@ -26,12 +26,13 @@ import java.util.Set;
 
 public class SimpleDocumentFormatRegistry implements DocumentFormatRegistry {
 
-	private List<DocumentFormat> documentFormats = new ArrayList<DocumentFormat>();
+	private final List<DocumentFormat> documentFormats = new ArrayList<>();
 
 	public void addFormat(DocumentFormat documentFormat) {
 		documentFormats.add(documentFormat);
 	}
 
+        @Override
 	public DocumentFormat getFormatByExtension(String extension) {
         if (extension == null) {
             return null;
@@ -46,6 +47,7 @@ public class SimpleDocumentFormatRegistry implements DocumentFormatRegistry {
 		return null;
 	}
 
+        @Override
 	public DocumentFormat getFormatByMediaType(String mediaType) {
         if (mediaType == null) {
             return null;
@@ -59,8 +61,9 @@ public class SimpleDocumentFormatRegistry implements DocumentFormatRegistry {
 	    return null;
 	}
 
+        @Override
 	public Set<DocumentFormat> getOutputFormats(DocumentFamily family) {
-	    Set<DocumentFormat> formats = new HashSet<DocumentFormat>();
+	    Set<DocumentFormat> formats = new HashSet<>();
         for (DocumentFormat format : documentFormats) {
             if (format.getStoreProperties(family) != null) {
                 formats.add(format);
