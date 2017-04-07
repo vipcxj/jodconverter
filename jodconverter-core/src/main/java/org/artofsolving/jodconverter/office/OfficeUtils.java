@@ -134,6 +134,13 @@ public class OfficeUtils {
     public static String getJPipePath(File officeHome) {
         if (PlatformUtils.isWindows()) {
             return new File(getOfficeBinDir(officeHome), "jpipe.dll").getAbsolutePath();
+        } else if (PlatformUtils.isMac()) {
+            File libFile;
+            libFile = new File(getOfficeBinDir(officeHome), "jpipe.so");
+            if (!libFile.exists()) {
+                libFile = new File(getOfficeBinDir(officeHome), "jpipe.jnilib");
+            }
+            return libFile.getAbsolutePath();
         } else {
             return new File(getOfficeBinDir(officeHome), "jpipe.so").getAbsolutePath();
         }

@@ -2,10 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>org.artofsolving.jodconverter</groupId>
+    <parent>
+        <groupId>org.artofsolving.jodconverter</groupId>
+        <artifactId>jodconverter</artifactId>
+        <version>3.0-CXJ-SNAPSHOT</version>
+    </parent>
     <artifactId>jodconverter-core</artifactId>
-    <version>3.0-CXJ-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>JODConverter - Core Library</name>
@@ -33,15 +35,6 @@
             <email>mirko@artofsolving.com</email>
         </developer>
     </developers>
-  
-    <properties>
-        <commons.io.version>2.5</commons.io.version>
-        <commons.cli.version>1.4</commons.cli.version>
-        <openoffice.version>4.1.2</openoffice.version>
-        <libreoffice.version>5.2.0</libreoffice.version>
-        <fastjson.version>1.2.31</fastjson.version>
-        <testng.version>6.11</testng.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -76,11 +69,11 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.0.2</version>
                     <configuration>
                         <archive>
                             <manifest>
                                 <mainClass>org.artofsolving.jodconverter.cli.Convert</mainClass>
-                                <addClasspath>true</addClasspath>
                             </manifest>
                         </archive>
                     </configuration>
@@ -90,28 +83,11 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                    <testSource>1.7</testSource>
-                    <testTarget>1.7</testTarget>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.0.2</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -121,6 +97,11 @@
                         <descriptor>src/main/assembly/dist.xml</descriptor>
                     </descriptors>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
             </plugin>
         </plugins>
     </build>
@@ -139,19 +120,6 @@
             </plugin>
         </plugins>
     </reporting>
-
-    <distributionManagement>
-        <repository>
-            <id>proland-release</id>
-            <name>Proland project release</name>
-            <url>http://192.168.1.116:8082/nexus/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>proland-snapshots</id>
-            <name>Proland project snapshots</name>
-            <url>http://192.168.1.116:8082/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
     
     <profiles>
         <profile>
@@ -161,24 +129,9 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>org.libreoffice</groupId>
-                    <artifactId>juh</artifactId>
-                    <version>${libreoffice.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.libreoffice</groupId>
-                    <artifactId>ridl</artifactId>
-                    <version>${libreoffice.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.libreoffice</groupId>
-                    <artifactId>unoil</artifactId>
-                    <version>${libreoffice.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.libreoffice</groupId>
-                    <artifactId>jurt</artifactId>
-                    <version>${libreoffice.version}</version>
+                    <groupId>org.artofsolving.jodconverter</groupId>
+                    <artifactId>office-pipe-hack</artifactId>
+                    <version>${project.version}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -186,67 +139,48 @@
             <id>libreoffice</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.libreoffice</groupId>
-                    <artifactId>juh</artifactId>
-                    <version>${libreoffice.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.libreoffice</groupId>
-                    <artifactId>ridl</artifactId>
-                    <version>${libreoffice.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.libreoffice</groupId>
-                    <artifactId>unoil</artifactId>
-                    <version>${libreoffice.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.libreoffice</groupId>
-                    <artifactId>jurt</artifactId>
-                    <version>${libreoffice.version}</version>
+                    <groupId>org.artofsolving.jodconverter</groupId>
+                    <artifactId>office-pipe-hack</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>with-libreoffice</classifier>
                 </dependency>
             </dependencies>
             <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <configuration>
-                            <classifier>libreoffice</classifier>
-                        </configuration>
-                    </plugin>
-                </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-jar-plugin</artifactId>
+                            <configuration>
+                                <classifier>with-libreoffice</classifier>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
         <profile>
             <id>openoffice</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.openoffice</groupId>
-                    <artifactId>juh</artifactId>
-                    <version>${openoffice.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.openoffice</groupId>
-                    <artifactId>ridl</artifactId>
-                    <version>${openoffice.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.openoffice</groupId>
-                    <artifactId>unoil</artifactId>
-                    <version>${openoffice.version}</version>
+                    <groupId>org.artofsolving.jodconverter</groupId>
+                    <artifactId>office-pipe-hack</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>with-openoffice</classifier>
                 </dependency>
             </dependencies>
             <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <configuration>
-                            <classifier>openoffice</classifier>
-                        </configuration>
-                    </plugin>
-                </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-jar-plugin</artifactId>
+                            <configuration>
+                                <classifier>with-openoffice</classifier>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
     </profiles>
