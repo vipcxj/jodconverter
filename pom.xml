@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.artofsolving.jodconverter</groupId>
+    <artifactId>jodconverter</artifactId>
+    <version>3.0-CXJ-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>JODConverter</name>
+    <modules>
+        <module>jodconverter-core</module>
+        <module>office-pipe-hack</module>
+        <module>hacked-pipe-connection</module>
+    </modules>
+    
+    <properties>
+        <maven.compiler.source>1.7</maven.compiler.source>       
+        <maven.compiler.target>1.7</maven.compiler.target>   
+        <commons.io.version>2.5</commons.io.version>
+        <commons.cli.version>1.4</commons.cli.version>
+        <openoffice.version>4.1.2</openoffice.version>
+        <libreoffice.version>5.2.0</libreoffice.version>
+        <fastjson.version>1.2.31</fastjson.version>
+        <testng.version>6.11</testng.version>
+    </properties>
+    
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.6.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>libreoffice</id>
+        </profile>
+        <profile>
+            <id>openoffice</id>
+        </profile>
+    </profiles>
+    
+    <distributionManagement>
+        <repository>
+            <id>proland-release</id>
+            <name>Proland project release</name>
+            <url>http://192.168.1.116:8082/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>proland-snapshots</id>
+            <name>Proland project snapshots</name>
+            <url>http://192.168.1.116:8082/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>
