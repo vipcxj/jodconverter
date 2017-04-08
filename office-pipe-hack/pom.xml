@@ -14,7 +14,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>${commons.io.version}</version>
         </dependency>
         <dependency>
             <groupId>org.artofsolving.jodconverter</groupId>
@@ -54,7 +53,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -109,22 +107,18 @@
                 <dependency>
                     <groupId>org.libreoffice</groupId>
                     <artifactId>juh</artifactId>
-                    <version>${libreoffice.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.libreoffice</groupId>
                     <artifactId>ridl</artifactId>
-                    <version>${libreoffice.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.libreoffice</groupId>
                     <artifactId>unoil</artifactId>
-                    <version>${libreoffice.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.libreoffice</groupId>
                     <artifactId>jurt</artifactId>
-                    <version>${libreoffice.version}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -134,22 +128,18 @@
                 <dependency>
                     <groupId>org.libreoffice</groupId>
                     <artifactId>juh</artifactId>
-                    <version>${libreoffice.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.libreoffice</groupId>
                     <artifactId>ridl</artifactId>
-                    <version>${libreoffice.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.libreoffice</groupId>
                     <artifactId>unoil</artifactId>
-                    <version>${libreoffice.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.libreoffice</groupId>
                     <artifactId>jurt</artifactId>
-                    <version>${libreoffice.version}</version>
                 </dependency>
             </dependencies>
             <build>
@@ -171,17 +161,14 @@
                 <dependency>
                     <groupId>org.openoffice</groupId>
                     <artifactId>juh</artifactId>
-                    <version>${openoffice.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.openoffice</groupId>
                     <artifactId>ridl</artifactId>
-                    <version>${openoffice.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.openoffice</groupId>
                     <artifactId>unoil</artifactId>
-                    <version>${openoffice.version}</version>
                 </dependency>
             </dependencies>
             <build>
