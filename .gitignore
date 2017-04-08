@@ -1,3 +1,4 @@
 /office-pipe-hack/target/
 /jodconverter-core/target/
+/jodconverter-core/src/test/resources/jodconverter.properties
 /hacked-pipe-connection/target/
