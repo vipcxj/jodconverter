@@ -18,21 +18,18 @@
  */
 package com.sun.star.lib.connections.pipe;
 
+import com.sun.star.connection.XConnection;
+import com.sun.star.connection.XConnectionBroadcaster;
+import com.sun.star.io.XStreamListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import com.sun.star.connection.XConnection;
-import com.sun.star.connection.XConnectionBroadcaster;
-import com.sun.star.io.XStreamListener;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 /**
- * The PipeConnectionWrapper implements the <code>XConnection</code> interface and is
- * uses by the <code>PipeConnector</code> and the <code>PipeAcceptor</code>.
- * This class is not part of the provided <code>api</code>.
+ * The PipeConnectionWrapper implements the <code>XConnection</code> interface
+ * and is uses by the <code>PipeConnector</code> and the
+ * <code>PipeAcceptor</code>. This class is not part of the provided
+ * <code>api</code>.
  *
  * @see com.sun.star.lib.connections.pipe.pipeAcceptor
  * @see com.sun.star.lib.connections.pipe.pipeConnector
@@ -50,32 +47,27 @@ public class PipeConnectionWrapper implements XConnection, XConnectionBroadcaste
 //        // load shared library for JNI code
 //        NativeLibraryLoader.loadLibrary(PipeConnectionWrapper.class.getClassLoader(), "jpipe");
 //    }
-    private final Object jniObject;
-    private Method createJNI;
-    private Method closeJNI;
-    private Method flushJNI;
-    private Method readJNI;
-    private Method writeJNI;
+    private JniPipe jni;
     protected ArrayList<XStreamListener> _aListeners;
     protected boolean _bFirstRead;
+
+    private String aPipeName;
 
     /**
      * Constructs a new <code>PipeConnection</code>.
      *
      * @param description the description of the connection.
      */
-    public PipeConnectionWrapper(Object jniObj, String description)
-            throws IOException {
-        this.jniObject = jniObj;
+    public PipeConnectionWrapper(String description) {
+        this.jni = new JniPipe();
         if (DEBUG) {
             System.err.println("##### " + getClass().getName() + " - instantiated " + description);
         }
 
-        _aListeners = new ArrayList<XStreamListener>();
+        _aListeners = new ArrayList<>();
         _bFirstRead = true;
 
         // get pipe name from pipe descriptor
-        String aPipeName;
         StringTokenizer aTokenizer = new StringTokenizer(description, ",");
         if (aTokenizer.hasMoreTokens()) {
             String aConnType = aTokenizer.nextToken();
@@ -92,20 +84,26 @@ public class PipeConnectionWrapper implements XConnection, XConnectionBroadcaste
             throw new RuntimeException("invalid or empty pipe descriptor");
         }
 
-        // create the pipe
+    }
+
+    public String getPipeName() {
+        return aPipeName;
+    }
+
+    public void createConnect() throws IOException {
         try {
-            createJNI(aPipeName);
-        } catch (java.lang.Exception ex1) {
-            IOException ex2 = new IOException();
-            ex2.initCause(ex1);
-            throw ex2;
+            jni.createJNI(aPipeName);
+        } catch (java.lang.Exception e) {
+            throw new IOException(e);
         }
     }
 
+    @Override
     public void addStreamListener(XStreamListener aListener) throws com.sun.star.uno.RuntimeException {
         _aListeners.add(aListener);
     }
 
+    @Override
     public void removeStreamListener(XStreamListener aListener) throws com.sun.star.uno.RuntimeException {
         _aListeners.remove(aListener);
     }
@@ -128,85 +126,40 @@ public class PipeConnectionWrapper implements XConnection, XConnectionBroadcaste
         }
     }
 
-    // JNI implementation to create the pipe
-    private int createJNI(String name)
-            throws com.sun.star.io.IOException, com.sun.star.uno.RuntimeException {
-        try {
-            if (createJNI == null) {
-                createJNI = jniObject.getClass().getDeclaredMethod("createJNI", String.class);
-            }
-            createJNI.setAccessible(true);
-            return (int) createJNI.invoke(jniObject, name);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-            throw new com.sun.star.io.IOException(ex);
-        }
-    }
-
     // JNI implementation to read from the pipe
     private int readJNI(/*OUT*/byte[][] bytes, int nBytesToRead)
             throws com.sun.star.io.IOException, com.sun.star.uno.RuntimeException {
-        try {
-            if (readJNI == null) {
-                readJNI = jniObject.getClass().getDeclaredMethod("readJNI", byte[][].class, int.class);
-            }
-            readJNI.setAccessible(true);
-            return (int) readJNI.invoke(jniObject, bytes, nBytesToRead);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-            throw new com.sun.star.io.IOException(ex);
-        }
+        return jni.readJNI(bytes, nBytesToRead);
     }
 
     // JNI implementation to write to the pipe
     private void writeJNI(byte aData[])
             throws com.sun.star.io.IOException, com.sun.star.uno.RuntimeException {
-        try {
-            if (writeJNI == null) {
-                writeJNI = jniObject.getClass().getDeclaredMethod("writeJNI", byte[].class);
-            }
-            writeJNI.setAccessible(true);
-            writeJNI.invoke(jniObject, aData);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-            throw new com.sun.star.io.IOException(ex);
-        }
+        jni.writeJNI(aData);
     }
 
     // JNI implementation to flush the pipe
     private void flushJNI()
             throws com.sun.star.io.IOException, com.sun.star.uno.RuntimeException {
-        try {
-            if (flushJNI == null) {
-                flushJNI = jniObject.getClass().getDeclaredMethod("flushJNI");
-            }
-            flushJNI.setAccessible(true);
-            flushJNI.invoke(jniObject);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-            throw new com.sun.star.io.IOException(ex);
-        }
+        jni.flushJNI();
     }
 
     // JNI implementation to close the pipe
     private void closeJNI()
             throws com.sun.star.io.IOException, com.sun.star.uno.RuntimeException {
-        try {
-            if (closeJNI == null) {
-                closeJNI = jniObject.getClass().getDeclaredMethod("closeJNI");
-            }
-            closeJNI.setAccessible(true);
-            closeJNI.invoke(jniObject);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-            throw new com.sun.star.io.IOException(ex);
-        }
+        jni.closeJNI();
     }
 
     /**
      * Read the required number of bytes.
      *
-     * @param bytes the outparameter, where the bytes have to be placed.
+     * @param bytes        the outparameter, where the bytes have to be placed.
      * @param nBytesToRead the number of bytes to read.
      * @return the number of bytes read.
      *
      * @see com.sun.star.connection.XConnection#read
      */
+    @Override
     public int read(/*OUT*/byte[][] bytes, int nBytesToRead)
             throws com.sun.star.io.IOException, com.sun.star.uno.RuntimeException {
         if (_bFirstRead) {
@@ -215,7 +168,12 @@ public class PipeConnectionWrapper implements XConnection, XConnectionBroadcaste
             notifyListeners_open();
         }
 
-        return readJNI(bytes, nBytesToRead);
+        try {
+            return readJNI(bytes, nBytesToRead);
+        } catch (com.sun.star.io.IOException e) {
+            notifyListeners_error(e);
+            throw e;
+        }
     }
 
     /**
@@ -224,9 +182,15 @@ public class PipeConnectionWrapper implements XConnection, XConnectionBroadcaste
      * @param aData the bytes to write.
      * @see com.sun.star.connection.XConnection#write
      */
+    @Override
     public void write(byte aData[])
             throws com.sun.star.io.IOException, com.sun.star.uno.RuntimeException {
-        writeJNI(aData);
+        try {
+            writeJNI(aData);
+        } catch (com.sun.star.io.IOException e) {
+            notifyListeners_error(e);
+            throw e;
+        }
     }
 
     /**
@@ -234,9 +198,15 @@ public class PipeConnectionWrapper implements XConnection, XConnectionBroadcaste
      *
      * @see com.sun.star.connection.XConnection#flush
      */
+    @Override
     public void flush()
             throws com.sun.star.io.IOException, com.sun.star.uno.RuntimeException {
-        flushJNI();
+        try {
+            flushJNI();
+        } catch (com.sun.star.io.IOException e) {
+            notifyListeners_error(e);
+            throw e;
+        }
     }
 
     /**
@@ -244,15 +214,21 @@ public class PipeConnectionWrapper implements XConnection, XConnectionBroadcaste
      *
      * @see com.sun.star.connection.XConnection#close
      */
+    @Override
     public void close()
             throws com.sun.star.io.IOException, com.sun.star.uno.RuntimeException {
         if (DEBUG) {
             System.out.print("PipeConnection::close() ");
         }
-        closeJNI();
-        notifyListeners_close();
-        if (DEBUG) {
-            System.out.println("done");
+        try {
+            closeJNI();
+            notifyListeners_close();
+            if (DEBUG) {
+                System.out.println("done");
+            }
+        } catch (com.sun.star.io.IOException e) {
+            notifyListeners_error(e);
+            throw e;
         }
     }
 
@@ -262,14 +238,9 @@ public class PipeConnectionWrapper implements XConnection, XConnectionBroadcaste
      * @return the description.
      * @see com.sun.star.connection.XConnection#getDescription
      */
+    @Override
     public String getDescription() throws com.sun.star.uno.RuntimeException {
-        try {
-            Field field = jniObject.getClass().getDeclaredField("_aDescription");
-            field.setAccessible(true);
-            return (String) field.get(jniObject);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            throw new com.sun.star.uno.RuntimeException(ex);
-        }
+        return jni.getDescription();
     }
 
 }

@@ -26,9 +26,6 @@ import com.sun.star.connection.XConnector;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.lang.XSingleServiceFactory;
 import com.sun.star.registry.XRegistryKey;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,7 +55,6 @@ public final class pipeConnector implements XConnector {
      * @see com.sun.star.comp.loader.JavaLoader
      */
     public static final String __serviceName = "com.sun.star.connection.pipeConnector";
-    public static volatile Class PIPE_CLASS = null;
 
     /**
      * Returns a factory for creating the service.
@@ -81,23 +77,6 @@ public final class pipeConnector implements XConnector {
                         __serviceName, multiFactory,
                         regKey)
                 : null;
-    }
-
-    public static Class<? extends XConnection> getPipeClass() throws ClassNotFoundException {
-        if (PIPE_CLASS == null) {
-            System.out.println("No pipe class, create.");
-            try {
-                PIPE_CLASS = NativeUtils.loadConnectionClass();
-            } catch (IOException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        return PIPE_CLASS;
-    }
-
-    private XConnection createPipeConnection(String connectionDescription) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
-        Constructor<? extends XConnection> constructor = getPipeClass().getConstructor();
-        return new PipeConnectionWrapper(constructor.newInstance(), connectionDescription);
     }
 
     /**
@@ -131,21 +110,14 @@ public final class pipeConnector implements XConnector {
         }
 
         try {
-            String pipeName = null;
-            if (connectionDescription != null) {
-                int idx = connectionDescription.indexOf("=");
-                if (idx != -1 && connectionDescription.length() > idx + 1) {
-                    pipeName = connectionDescription.substring(idx + 1, connectionDescription.length());
-                }
-            }
-            XConnection xConn = null;
+            PipeConnectionWrapper xConn = new PipeConnectionWrapper(connectionDescription);
             long begin = System.currentTimeMillis();
             Exception ioEx = null;
             int times = 0;
             while (System.currentTimeMillis() - begin < 9000) {
                 try {
                     ++ times;
-                    xConn = createPipeConnection(connectionDescription);
+                    xConn.createConnect();
                     bConnected = true;
                     break;
                 } catch (Exception e) {
@@ -155,14 +127,14 @@ public final class pipeConnector implements XConnector {
             }
             if (!bConnected) {
                 if (ioEx == null) {
-                    throw new NoConnectException("Unable connect the pipe with " + pipeName + ".");
+                    throw new NoConnectException("Unable connect the pipe with " + xConn.getPipeName() + ".");
                 } else {
                     throw new NoConnectException(ioEx);
                 }
             } else {
                 Logger.getLogger(pipeAcceptor.class.getName())
                         .log(Level.INFO, "Successfully connect to the pipe: {0}. Cost time: {1}ms with {2} times try.", 
-                                new Object[]{pipeName, System.currentTimeMillis() - begin, times});
+                                new Object[]{xConn.getPipeName(), System.currentTimeMillis() - begin, times});
             }
             return xConn;
         } catch (InterruptedException | IllegalArgumentException ex) {

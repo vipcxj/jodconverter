@@ -10,6 +10,7 @@
         <module>jodconverter-core</module>
         <module>office-pipe-hack</module>
         <module>hacked-pipe-connection</module>
+        <module>container-test</module>
     </modules>
     
     <properties>

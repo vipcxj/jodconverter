@@ -5,7 +5,7 @@
  */
 package org.artofsolving.jodconverter.util;
 
-import com.sun.star.lib.connections.pipe.pipeConnector;
+import com.sun.star.lib.connections.pipe.PipeConfigure;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +41,6 @@ public class PropertiesConfiguration {
     private final static String CONF_CONNECT_ONSTART = "connect.onstart";
 
     private ProcessManager processManager = null;
-    private static volatile String pipePath = null;
-    private static volatile String binPath = null;
 
     private final Properties properties;
 
@@ -81,11 +79,17 @@ public class PropertiesConfiguration {
 
     public File getOfficeHome() {
         String officeHome = properties.getProperty(CONF_OFFICE_HOME);
+        File officeHomeFile;
         if (officeHome != null) {
-            return new File(officeHome);
+            officeHomeFile = new File(officeHome);
         } else {
-            return OfficeUtils.getDefaultOfficeHome();
+            officeHomeFile = OfficeUtils.getDefaultOfficeHome();
         }
+        String pipePath = OfficeUtils.getJPipePath(officeHomeFile);
+        if (!Objects.equals(PipeConfigure.getPipeLibraryPath(), pipePath)) {
+            PipeConfigure.setPipeLibraryPath(pipePath);
+        }
+        return officeHomeFile;
     }
 
     public void setOfficeHome(File file) {
@@ -255,33 +259,7 @@ public class PropertiesConfiguration {
         if (protocol == null) {
             protocol = OfficeConnectionProtocol.SOCKET;
         }
-        if (protocol == OfficeConnectionProtocol.PIPE) {
-            loadPipeLibrary(getOfficeHome());
-        }
         return protocol;
-    }
-
-    private static synchronized boolean loadPipeLibrary(File officeHome) {
-//        String binPithNow = OfficeUtils.getOfficeBinDir(officeHome).getAbsolutePath();
-//        if (!Objects.equals(binPithNow, binPath)) {
-//            if (!NativeUtils.replaceLibraryPath(binPath, binPithNow, true) || !NativeUtils.loadSystemSharedLibrary("jpipe", false)) {
-//                return false;
-//            }
-//            binPath = binPithNow;
-//        }
-        String pipePathNow = OfficeUtils.getJPipePath(officeHome);
-        if (!Objects.equals(pipePathNow, pipePath)) {
-            try {
-                if (!NativeUtils.loadNativeLibrary(pipeConnector.getPipeClass(), pipePathNow, true)) {
-                    return false;
-                }
-            } catch (ClassNotFoundException ex) {
-                LOGGER.warning("Unable to create PipeConnection.");
-                return false;
-            }
-            pipePath = pipePathNow;
-        }
-        return true;
     }
 
     public void setProtocol(OfficeConnectionProtocol protocol) {

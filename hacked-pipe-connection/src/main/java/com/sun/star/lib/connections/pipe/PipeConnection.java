@@ -30,28 +30,56 @@ package com.sun.star.lib.connections.pipe;
  */
 public class PipeConnection {
 
-    protected String _aDescription;
-    protected long _nPipeHandle;
+    public static volatile boolean LOADED = false;
+
+    static {
+        try {
+            String path = PipeNativeLibraryHelper.getPipeLibraryPath();
+            if (path != null && !path.isEmpty()) {
+                Runtime.getRuntime().load(PipeNativeLibraryHelper.getPipeLibraryPath());
+                LOADED = true;
+            }
+        } catch (SecurityException | UnsatisfiedLinkError e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    String _aDescription;
+    long _nPipeHandle;
+
+    public PipeConnection() {
+        System.out.println("PipeConnection: " + getClass().getClassLoader());
+    }
+    
+    
 
     // JNI implementation to create the pipe
-    private native int createJNI(String name)
+    native int createJNI(String name)
             throws com.sun.star.io.IOException;
 
     // JNI implementation to read from the pipe
-    private native int readJNI(/*OUT*/byte[][] bytes, int nBytesToRead)
+    native int readJNI(/*OUT*/byte[][] bytes, int nBytesToRead)
             throws com.sun.star.io.IOException;
 
     // JNI implementation to write to the pipe
-    private native void writeJNI(byte aData[])
+    native void writeJNI(byte aData[])
             throws com.sun.star.io.IOException;
 
     // JNI implementation to flush the pipe
-    private native void flushJNI()
+    native void flushJNI()
             throws com.sun.star.io.IOException;
 
     // JNI implementation to close the pipe
-    private native void closeJNI()
+    native void closeJNI()
             throws com.sun.star.io.IOException;
+
+    public String getDescription() {
+        return _aDescription;
+    }
+
+    public static boolean isNativeLibraryLoaded() {
+        return LOADED;
+    }
 
 }
 

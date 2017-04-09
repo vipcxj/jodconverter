@@ -2,3 +2,5 @@
 /jodconverter-core/target/
 /jodconverter-core/src/test/resources/jodconverter.properties
 /hacked-pipe-connection/target/
+/container-test/target/
+/container-test/server/
