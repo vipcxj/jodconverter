@@ -2,5 +2,4 @@
 /jodconverter-core/target/
 /hacked-pipe-connection/target/
 /container-test/target/
-/container-test/server-embedded/
-/container-test/server-managed/
+/container-test/server/

@@ -108,8 +108,8 @@
             </dependencies>
             <properties>
                 <wildfly.dist.version>10.1.0.Final</wildfly.dist.version>
-                <wildfly.dir.parent>server-embedded</wildfly.dir.parent>
-                <wildfly.dir.name>wildfly</wildfly.dir.name>
+                <wildfly.dir.parent>server</wildfly.dir.parent>
+                <wildfly.dir.name>wildfly-embedded</wildfly.dir.name>
             </properties>
             <build>
                 <testResources>
@@ -167,8 +167,8 @@
             </dependencies>
             <properties>
                 <wildfly.dist.version>10.1.0.Final</wildfly.dist.version>
-                <wildfly.dir.parent>server-managed</wildfly.dir.parent>
-                <wildfly.dir.name>wildfly</wildfly.dir.name>
+                <wildfly.dir.parent>server</wildfly.dir.parent>
+                <wildfly.dir.name>wildfly-managed</wildfly.dir.name>
             </properties>
             <build>
                 <testResources>
