@@ -6,8 +6,8 @@
         http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
     <container qualifier="wildfly-managed" default="true">
         <configuration>
-            <property name="jbossHome">${wildfly.dir.parent}/${wildfly.dir.name}-${wildfly.dist.version}</property>
-            <property name="modulePath">${wildfly.dir.parent}/${wildfly.dir.name}-${wildfly.dist.version}/modules</property>
+            <property name="jbossHome">${test.server.dir}/${test.server.name}-${test.server.version}</property>
+            <property name="modulePath">${test.server.dir}/${test.server.name}-${test.server.version}/modules</property>
         </configuration>
     </container>
 </arquillian>

@@ -107,9 +107,9 @@
                 </dependency>
             </dependencies>
             <properties>
-                <wildfly.dist.version>10.1.0.Final</wildfly.dist.version>
-                <wildfly.dir.parent>server</wildfly.dir.parent>
-                <wildfly.dir.name>wildfly-embedded</wildfly.dir.name>
+                <test.server.name>wildfly</test.server.name>
+                <test.server.version>10.1.0.Final</test.server.version>
+                <test.server.dir>server/embedded</test.server.dir>
             </properties>
             <build>
                 <testResources>
@@ -133,11 +133,10 @@
                                         <artifactItem>
                                             <groupId>org.wildfly</groupId>
                                             <artifactId>wildfly-dist</artifactId>
-                                            <version>${wildfly.dist.version}</version>
+                                            <version>${test.server.version}</version>
                                             <type>zip</type>
                                             <overWrite>false</overWrite>
-                                            <outputDirectory>${wildfly.dir.parent}</outputDirectory>
-                                            <destFileName>${wildfly.dir.name}</destFileName>
+                                            <outputDirectory>${test.server.dir}</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
@@ -166,9 +165,9 @@
                 </dependency>
             </dependencies>
             <properties>
-                <wildfly.dist.version>10.1.0.Final</wildfly.dist.version>
-                <wildfly.dir.parent>server</wildfly.dir.parent>
-                <wildfly.dir.name>wildfly-managed</wildfly.dir.name>
+                <test.server.name>wildfly</test.server.name>
+                <test.server.version>10.1.0.Final</test.server.version>
+                <test.server.dir>server/managed</test.server.dir>
             </properties>
             <build>
                 <testResources>
@@ -192,11 +191,10 @@
                                         <artifactItem>
                                             <groupId>org.wildfly</groupId>
                                             <artifactId>wildfly-dist</artifactId>
-                                            <version>${wildfly.dist.version}</version>
+                                            <version>${test.server.version}</version>
                                             <type>zip</type>
                                             <overWrite>false</overWrite>
-                                            <outputDirectory>${wildfly.dir.parent}</outputDirectory>
-                                            <destFileName>${wildfly.dir.name}</destFileName>
+                                            <outputDirectory>${test.server.dir}</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
@@ -209,9 +207,10 @@
         <profile>
             <id>wildfly-remote</id>
             <properties>
-                <wildfly.test.version>9.0.2.Final</wildfly.test.version>
-                <wildfly.test.address>127.0.0.1</wildfly.test.address>
-                <wildfly.test.port>9990</wildfly.test.port>
+                <test.server.name>wildfly</test.server.name>
+                <test.server.version>9.0.2.Final</test.server.version>
+                <test.server.address>127.0.0.1</test.server.address>
+                <test.server.port>9990</test.server.port>
             </properties>
             <dependencies>
                 <dependency>

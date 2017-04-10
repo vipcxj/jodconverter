@@ -6,10 +6,10 @@
         http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
     <container qualifier="wildfly-managed" default="true">
         <configuration>
-            <property name="chameleonTarget">wildfly:${wildfly.test.version}:remote</property>
+            <property name="chameleonTarget">${test.server.name}:${test.server.version}:remote</property>
             <property name="allowConnectingToRunningServer">true</property>
-            <property name="managementAddress">${wildfly.test.address}</property>
-            <property name="managementPort">${wildfly.test.port}</property>
+            <property name="managementAddress">${test.server.address}</property>
+            <property name="managementPort">${test.server.port}</property>
             <property name="outputToConsole">true</property>
         </configuration>
     </container>
