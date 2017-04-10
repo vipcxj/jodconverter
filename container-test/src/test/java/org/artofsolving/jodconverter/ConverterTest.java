@@ -53,7 +53,7 @@ public class ConverterTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        PomEquippedResolveStage resolver = Maven.configureResolver().loadPomFromFile("pom.xml");
+        PomEquippedResolveStage resolver = Maven.configureResolver().withClassPathResolution(false).workOffline().loadPomFromFile("pom.xml");
         JavaArchive[] jodArchives = resolver.resolve("org.artofsolving.jodconverter:jodconverter-core:?").withTransitivity().as(JavaArchive.class);
         WebArchive archive = ShrinkWrap.create(WebArchive.class)
                 .addAsLibraries(jodArchives)

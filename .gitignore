@@ -1,6 +1,6 @@
 /office-pipe-hack/target/
 /jodconverter-core/target/
-/jodconverter-core/src/test/resources/jodconverter.properties
 /hacked-pipe-connection/target/
 /container-test/target/
-/container-test/server/
+/container-test/server-embedded/
+/container-test/server-managed/

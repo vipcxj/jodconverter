@@ -7,9 +7,9 @@
     <packaging>pom</packaging>
     <name>JODConverter</name>
     <modules>
-        <module>jodconverter-core</module>
-        <module>office-pipe-hack</module>
         <module>hacked-pipe-connection</module>
+        <module>office-pipe-hack</module>
+        <module>jodconverter-core</module>
         <module>container-test</module>
     </modules>
     
@@ -24,6 +24,8 @@
         <libreoffice.version>5.2.0</libreoffice.version>
         <fastjson.version>1.2.31</fastjson.version>
         <testng.version>6.11</testng.version>
+        
+        <office.home>F:\cxj\software\LibreOffice5</office.home>
     </properties>
     
     <dependencyManagement>

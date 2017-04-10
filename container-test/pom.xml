@@ -10,6 +10,24 @@
     <packaging>jar</packaging>
     <name>JODConverter - Container Test</name>
     
+    <build>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+                <includes>
+                    <include>jodconverter.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </testResource>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+                <excludes>
+                    <exclude>jodconverter.properties</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+    </build>
+    
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -90,14 +108,11 @@
             </dependencies>
             <properties>
                 <wildfly.dist.version>10.1.0.Final</wildfly.dist.version>
-                <wildfly.dir.parent>server</wildfly.dir.parent>
+                <wildfly.dir.parent>server-embedded</wildfly.dir.parent>
                 <wildfly.dir.name>wildfly</wildfly.dir.name>
             </properties>
             <build>
                 <testResources>
-                    <testResource>
-                        <directory>src/test/resources</directory>
-                    </testResource>
                     <testResource>
                         <directory>src/test/resources-arquillian-embedded</directory>
                         <filtering>true</filtering>
@@ -152,14 +167,11 @@
             </dependencies>
             <properties>
                 <wildfly.dist.version>10.1.0.Final</wildfly.dist.version>
-                <wildfly.dir.parent>server</wildfly.dir.parent>
+                <wildfly.dir.parent>server-managed</wildfly.dir.parent>
                 <wildfly.dir.name>wildfly</wildfly.dir.name>
             </properties>
             <build>
                 <testResources>
-                    <testResource>
-                        <directory>src/test/resources</directory>
-                    </testResource>
                     <testResource>
                         <directory>src/test/resources-arquillian-managed</directory>
                         <filtering>true</filtering>
@@ -199,7 +211,7 @@
             <properties>
                 <wildfly.test.version>9.0.2.Final</wildfly.test.version>
                 <wildfly.test.address>127.0.0.1</wildfly.test.address>
-                <wildfly.test.port>9991</wildfly.test.port>
+                <wildfly.test.port>9990</wildfly.test.port>
             </properties>
             <dependencies>
                 <dependency>
@@ -212,9 +224,6 @@
             <build>
                 <testResources>
                     <testResource>
-                        <directory>src/test/resources</directory>
-                    </testResource>
-                    <testResource>
                         <directory>src/test/resources-arquillian-remote</directory>
                         <filtering>true</filtering>
                     </testResource>
@@ -224,7 +233,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
-                                <jboss.home>D:\work\server\wildfly\wildfly-9.0.2.Final</jboss.home>
+                                <jboss.home>D:\cxj\jboss\wildfly-9.0.0.Final</jboss.home>
                                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                             </systemPropertyVariables>
                         </configuration>
