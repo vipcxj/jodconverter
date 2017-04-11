@@ -71,16 +71,13 @@ public abstract class AbstractFileBasedConversionTask extends AbstractConversion
         try {
             document = loader.loadComponentFromURL(toUrl(inputFile), "_blank",
                     0, toUnoProperties(loadProperties));
-        } catch (IllegalArgumentException illegalArgumentException) {
-            throw new OfficeException("could not load document: "
-                    + inputFile.getName(), illegalArgumentException);
         } catch (ErrorCodeIOException errorCodeIOException) {
             throw new OfficeException("could not load document: "
                     + inputFile.getName() + "; errorCode: "
                     + errorCodeIOException.ErrCode, errorCodeIOException);
-        } catch (IOException ioException) {
+        } catch (IllegalArgumentException | IOException illegalArgumentException) {
             throw new OfficeException("could not load document: "
-                    + inputFile.getName(), ioException);
+                    + inputFile.getName(), illegalArgumentException);
         }
         if (document == null) {
             throw new OfficeException("could not load document: "

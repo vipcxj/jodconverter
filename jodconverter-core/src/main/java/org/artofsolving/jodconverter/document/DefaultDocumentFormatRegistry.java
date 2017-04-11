@@ -48,11 +48,21 @@ public class DefaultDocumentFormatRegistry extends SimpleDocumentFormatRegistry 
         // HTML is treated as Text when supplied as input, but as an output it is also
         // available for exporting Spreadsheet and Presentation formats
         html.setInputFamily(DocumentFamily.TEXT);
-        html.setStoreProperties(DocumentFamily.TEXT, Collections.singletonMap("FilterName", "HTML (StarWriter)"));
-        html.setStoreProperties(DocumentFamily.SPREADSHEET, Collections.singletonMap("FilterName", "HTML (StarCalc)"));
-        html.setStoreProperties(DocumentFamily.PRESENTATION, Collections.singletonMap("FilterName", "impress_html_Export"));
-        html.setStoreProperties(DocumentFamily.DRAWING, Collections.singletonMap("FilterName", "draw_html_Export"));
+        html.setStoreProperties(DocumentFamily.TEXT, Collections.singletonMap("FilterName", "XHTML Writer File"));
+        html.setStoreProperties(DocumentFamily.SPREADSHEET, Collections.singletonMap("FilterName", "XHTML Calc File"));
+        html.setStoreProperties(DocumentFamily.PRESENTATION, Collections.singletonMap("FilterName", "XHTML Impress File"));
+        html.setStoreProperties(DocumentFamily.DRAWING, Collections.singletonMap("FilterName", "XHTML Draw File"));
         addFormat(html);
+        
+        DocumentFormat htm = new DocumentFormat("HTML", "htm", "text/html");
+        // HTML is treated as Text when supplied as input, but as an output it is also
+        // available for exporting Spreadsheet and Presentation formats
+        htm.setInputFamily(DocumentFamily.TEXT);
+        htm.setStoreProperties(DocumentFamily.TEXT, Collections.singletonMap("FilterName", "XHTML Writer File"));
+        htm.setStoreProperties(DocumentFamily.SPREADSHEET, Collections.singletonMap("FilterName", "XHTML Calc File"));
+        htm.setStoreProperties(DocumentFamily.PRESENTATION, Collections.singletonMap("FilterName", "XHTML Impress File"));
+        htm.setStoreProperties(DocumentFamily.DRAWING, Collections.singletonMap("FilterName", "XHTML Draw File"));
+        addFormat(htm);
 
         DocumentFormat odt = new DocumentFormat("OpenDocument Text", "odt", "application/vnd.oasis.opendocument.text");
         odt.setInputFamily(DocumentFamily.TEXT);
